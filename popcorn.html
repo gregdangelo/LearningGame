@@ -46,9 +46,6 @@ function addWords(words){
 		item = document.createElement('span');
 		item.innerHTML = words[i];
 
-		//console.log(words[i].toUpperCase());
-		//console.log(
-
 		if(popcorn.indexOf(words[i].toUpperCase())!=-1){
 			item.className="popcorn";
 			pwc++;
@@ -63,14 +60,17 @@ function addWords(words){
 }
 function validate(e){
 	var target = e.srcElement || e.target;
-	console.log(target);
+	if(current_popcorns ==0){
+		return;
+	}
+
 	if(target){
 		if(target.className == 'popcorn'){
 			current_popcorns--;
 			if(current_popcorns ==0){
 				if(phrases.length){
 					console.info('round over');
-					setupScreen()
+					setupScreen();
 				}else{
 					console.info('game over');
 				}
