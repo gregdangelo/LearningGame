@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+<head>
+	<title>Popcorn Words!</title>
+<style>
+	body {
+		font-family:arial;
+		margin-top:20px;
+	}
+	#words span,#words a {
+		cursor:pointer;
+		border:1px solid #666;
+		padding:10px;
+		margin:5px;
+	}
+	#words .pressed {
+		background:#F00;
+	}
+	#words .pressed.popcorn {
+		background:#FF0;
+	}
+</style>
+</head>
+<body>
+<div id="gameArea">
+	<div id="status">
+		<!-- words left, score, and maybe time would go here -->
+	</div>
+	<div id="words">
+	</div>
+</div>
+<script>
+var phrases = ["The cat in the hat","I like that","The car came to a stop"];
+var popcorn = ['THE','A','LIKE','I'];
+var mode = 1;
+current_popcorns = 0;
+function switchModes(){
+	mode = mode==1?0:1;
+}
+function addWords(words){
+	var wElm = document.getElementById('words');
+	var pwc = 0;
+	wElm.innerHTML = '';
+	var els = document.createDocumentFragment(),item;
+	for(var i=0;i<words.length;i++){
+		item = document.createElement('span');
+		item.innerHTML = words[i];
+
+		//console.log(words[i].toUpperCase());
+		//console.log(
+
+		if(popcorn.indexOf(words[i].toUpperCase())!=-1){
+			item.className="popcorn";
+			pwc++;
+		}
+
+		els.appendChild(item);
+
+
+	}
+	wElm.appendChild(els);
+	return pwc;
+}
+function validate(e){
+	var target = e.srcElement || e.target;
+	console.log(target);
+	if(target){
+		if(target.className == 'popcorn'){
+			current_popcorns--;
+			if(current_popcorns ==0){
+				if(phrases.length){
+					console.info('round over');
+					setupScreen()
+				}else{
+					console.info('game over');
+				}
+			}
+		}
+		target.className = target.className + ' pressed'
+	}
+}
+function setupScreen(){
+	var phrase = phrases.pop();
+	if(mode==0){
+		phrase = phrase.toUpperCase();
+	}
+	var parts = phrase.split(' ');
+	current_popcorns = addWords(parts);
+
+	var wElm = document.getElementById('words');
+	wElm.addEventListener('click',validate,false);
+}
+function main (){
+	setupScreen()
+}
+main();
+</script>
+</body>
+</html>
