@@ -7,6 +7,12 @@
 		font-family:arial;
 		margin-top:20px;
 	}
+	#gameArea  {
+		position:relative;
+	}
+	#gameArea > div {
+		height:40px;
+	}
 	#words span,#words a {
 		cursor:pointer;
 		border:1px solid #666;
@@ -24,18 +30,31 @@
 <body>
 <div id="gameArea">
 	<div id="status">
+		Score:<span id="score">0</span>
+		Words Left:<span id="pop_words">0</span>
 		<!-- words left, score, and maybe time would go here -->
 	</div>
 	<div id="words">
 	</div>
+	<div id="pop_images"></div>
 </div>
 <script>
 var phrases = ["The cat in the hat","I like that","The car came to a stop"];
 var popcorn = ['THE','A','LIKE','I'];
+var POINT_GOOD = 10;
+var POINT_BAD = -10;
 var mode = 1;
+var score = 0;
 current_popcorns = 0;
 function switchModes(){
 	mode = mode==1?0:1;
+}
+function updatePopcornWordsLeft(n){
+	document.getElementById('pop_words').innerHTML = n;
+}
+function updateScore(n){
+	score = score + n;
+	document.getElementById('score').innerHTML = score;
 }
 function addWords(words){
 	var wElm = document.getElementById('words');
@@ -67,6 +86,7 @@ function validate(e){
 	if(target){
 		if(target.className == 'popcorn'){
 			current_popcorns--;
+			updatePopcornWordsLeft(current_popcorns);
 			if(current_popcorns ==0){
 				if(phrases.length){
 					console.info('round over');
@@ -75,6 +95,10 @@ function validate(e){
 					console.info('game over');
 				}
 			}
+			updateScore(POINT_GOOD);
+			animatePopcorn();
+		}else{
+			updateScore(POINT_BAD);
 		}
 		target.className = target.className + ' pressed'
 	}
@@ -86,12 +110,60 @@ function setupScreen(){
 	}
 	var parts = phrase.split(' ');
 	current_popcorns = addWords(parts);
+	updatePopcornWordsLeft(current_popcorns);
 
 	var wElm = document.getElementById('words');
 	wElm.addEventListener('click',validate,false);
 }
+function preLoadImages(){
+	var img = new Image();
+	img.src = 'assets/popcorn.jpg';
+	img.onload = function(){
+		console.info('our image is loaded');
+	}
+}
+function animatePopcornStep(){
+	var img = document.getElementById('animate_pop');
+	var t = parseInt(img.style.bottom.replace('px'));
+	img.style.bottom = t + 10+'px';
+	if(t<200){
+		setTimeout(animatePopcornStep,30);
+	}else{
+		deAnimatePopcorn()
+	}
+}
+function animatePopcorn(){
+	var img = document.getElementById('animate_pop');
+	img.style.display = 'block';
+	img.style.opacity = '100';
+	img.style.bottom = '0px';
+	img.style.position = 'absolute';
+	animatePopcornStep();
+
+}
+function deAnimatePopcorn(){
+	var img = document.getElementById('animate_pop');
+	img.style.display = 'none';
+	img.style.opacity = '0';
+	img.style.bottom = '0px';
+	img.style.position = 'absolute';
+
+}
+function addPopcorn(){
+	var cont = document.getElementById('pop_images'),img = document.createElement('img');
+	img.src = 'assets/popcorn.jpg';
+	cont.appendChild(img);
+	img.style.opacity = '0';
+	img.style.display = 'none';
+	img.id = 'animate_pop';
+
+
+}
 function main (){
-	setupScreen()
+	preLoadImages();
+	setupScreen();
+	addPopcorn();
+
 }
 main();
 </script>
