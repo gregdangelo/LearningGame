@@ -39,13 +39,33 @@
 	<div id="pop_images"></div>
 </div>
 <script>
-var phrases = ["The cat in the hat","I like that","The car came to a stop"];
-var popcorn = ['THE','A','LIKE','I'];
+var phrases = ["The cat in the hat","I like that","Is this the food we like","The car came to a stop","Born in a manger","this is the place to eat"];
+var popcorn = ['THE','A','LIKE','I','IS'];
 var POINT_GOOD = 10;
 var POINT_BAD = -10;
 var mode = 1;
 var score = 0;
 current_popcorns = 0;
+
+var msg = new SpeechSynthesisUtterance();
+var voices = window.speechSynthesis.getVoices();
+msg.voice = voices[10]; // Note: some voices don't support altering params
+msg.voiceURI = 'native';
+msg.volume = 1; // 0 to 1
+msg.rate = 1; // 0.1 to 10
+msg.pitch = 2; //0 to 2
+msg.text = 'Welcome to Popcorn words!';
+msg.lang = 'en-US';
+
+msg.onend = function(e) {
+  console.log('Finished in ' + event.elapsedTime + ' seconds.');
+};
+
+speechSynthesis.speak(msg);
+function speak(text){
+msg.text = text;
+speechSynthesis.speak(msg);
+}
 function switchModes(){
 	mode = mode==1?0:1;
 }
@@ -53,6 +73,13 @@ function updatePopcornWordsLeft(n){
 	document.getElementById('pop_words').innerHTML = n;
 }
 function updateScore(n){
+	if(current_popcorns){
+		if(n>0){
+			speak('Way to Go!');
+		}else{
+			speak('oops, try again!');
+		}
+	}
 	score = score + n;
 	document.getElementById('score').innerHTML = score;
 }
@@ -90,9 +117,11 @@ function validate(e){
 			if(current_popcorns ==0){
 				if(phrases.length){
 					console.info('round over');
+					speak("Great Job. let\'s play some more");
 					setupScreen();
 				}else{
 					console.info('game over');
+					speak('Awesome job');
 				}
 			}
 			updateScore(POINT_GOOD);
@@ -108,6 +137,7 @@ function setupScreen(){
 	if(mode==0){
 		phrase = phrase.toUpperCase();
 	}
+	speak(phrase);
 	var parts = phrase.split(' ');
 	current_popcorns = addWords(parts);
 	updatePopcornWordsLeft(current_popcorns);
